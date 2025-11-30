@@ -1,0 +1,60 @@
+{
+  "shaderSettings": {
+    "swirlColorA": "#000000",
+    "swirlColorB": "#54190d",
+    "swirlSpeed": 1.5,
+    "swirlDetail": 2.6,
+    "swirlBlend": 63,
+    "swirlOpacity": 0.75,
+    "chromaBaseColor": "#b55a42",
+    "chromaUpColor": "#b55a42",
+    "chromaDownColor": "#000000",
+    "chromaLeftColor": "#e32400",
+    "chromaRightColor": "#ff6a00",
+    "chromaIntensity": 3.1,
+    "chromaRadius": 1.1,
+    "chromaMomentum": 13,
+    "backgroundColor": "#831100",
+    "accentColor": "#b55a42",
+    "textColor": "#ffffff",
+    "contentBackdropOpacity": 0,
+    "showDividers": true,
+    "unsplashEnabled": false,
+    "unsplashQuery": "nature dark",
+    "unsplashUrl": "",
+    "savedBackgrounds": [],
+    "greeting": "Hello Josh"
+  },
+  "notionSettings": {
+    "enabled": true,
+    "sortBy": "Date",
+    "sortDirection": "ascending",
+    "filters": []
+  },
+  "feedSettings": {
+    "reportsDatabaseId": "",
+    "n8nWebhookUrl": "",
+    "n8nWebhookSecret": "",
+    "enabled": true
+  },
+  "sectionVisibility": {
+    "shortcuts": true,
+    "todo": true,
+    "feed": true
+  },
+  "shortcuts": [
+    { "id": 1, "name": "Google", "type": "link", "url": "https://google.com", "icon": "G" },
+    { "id": 2, "name": "GitHub", "type": "link", "url": "https://github.com", "icon": "GH" },
+    { "id": 3, "name": "YouTube", "type": "link", "url": "https://youtube.com", "icon": "YT" },
+    { "id": 4, "name": "Claude", "type": "link", "url": "https://claude.ai/new", "icon": "C" },
+    { "id": 5, "name": "Claude Code", "type": "command", "url": "open -a Terminal && sleep 0.5 && osascript -e 'tell application \"Terminal\" to do script \"claude\"'", "icon": "CC" },
+    { "id": 6, "name": "Canvas", "type": "link", "url": "https://claude.ai/canvas", "icon": "CV" },
+    { "id": 7, "name": "Slack", "type": "app", "url": "slack", "icon": "S" }
+  ],
+  "todoLimit": 10,
+  "sectionsOpen": {
+    "shortcuts": true,
+    "todo": true,
+    "feed": true
+  }
+}

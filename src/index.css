@@ -1,0 +1,85 @@
+/* Domine Font */
+@font-face {
+    font-family: "Domine";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url(https://fonts.gstatic.com/s/domine/v23/L0xhDFMnlVwD4h3Lt9JWnbX3jG-2X3LAI10VErGuW8Q.woff2) format("woff2");
+}
+
+@font-face {
+    font-family: "Domine";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 700;
+    src: url(https://fonts.gstatic.com/s/domine/v23/L0xhDFMnlVwD4h3Lt9JWnbX3jG-2X3K8IU0VErGuW8Q.woff2) format("woff2");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+:root {
+    /* Colors from joshsyerlittle.com - reddish brown theme */
+    --background: #8b3a2e;
+    --foreground: #ffffff;
+    --text-color: #ffffff;
+    --text-color-90: rgba(255, 255, 255, 0.9);
+    --text-color-80: rgba(255, 255, 255, 0.8);
+    --text-color-60: rgba(255, 255, 255, 0.6);
+    --text-color-50: rgba(255, 255, 255, 0.5);
+    --text-color-40: rgba(255, 255, 255, 0.4);
+    --card: #8b3a2e;
+    --card-alpha: rgba(139, 58, 46, 0.8);
+    --muted: #6a2f1a;
+    --muted-foreground: rgba(255, 255, 255, 0.6);
+    --border: rgba(255, 255, 255, 0.2);
+    --border-alpha: rgba(255, 255, 255, 0.1);
+    --primary: #a84532;
+    --accent: #b55a42;
+    --secondary: #54190d;
+    --destructive: oklch(0.577 0.245 27.325);
+    --radius: 0rem;
+}
+
+body {
+    font-family: "Domine", ui-serif, Georgia, serif;
+    background: var(--background);
+    min-height: 100vh;
+    color: var(--text-color);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+/* Selection */
+::selection {
+    background: var(--primary);
+    color: var(--foreground);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+}

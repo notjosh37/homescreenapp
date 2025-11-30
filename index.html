@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>homescreenapp</title>
+    <style>
+      /* Disable transitions until React is ready to prevent color flash */
+      html:not(.transitions-ready) * {
+        transition: none !important;
+      }
+    </style>
+    <script>
+      // Load config from localStorage before React mounts to prevent color flash
+      (function() {
+        try {
+          var settings = JSON.parse(localStorage.getItem('shaderSettings') || '{}');
+          var root = document.documentElement;
+
+          // Set background color
+          if (settings.backgroundColor) {
+            root.style.setProperty('--background', settings.backgroundColor);
+          }
+
+          // Set accent color
+          if (settings.accentColor) {
+            root.style.setProperty('--accent', settings.accentColor);
+          }
+
+          // Set text color and opacity variants
+          if (settings.textColor) {
+            root.style.setProperty('--text-color', settings.textColor);
+            var hex = settings.textColor.replace('#', '');
+            var r = parseInt(hex.substring(0, 2), 16);
+            var g = parseInt(hex.substring(2, 4), 16);
+            var b = parseInt(hex.substring(4, 6), 16);
+            root.style.setProperty('--text-color-90', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.9)');
+            root.style.setProperty('--text-color-80', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.8)');
+            root.style.setProperty('--text-color-60', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.6)');
+            root.style.setProperty('--text-color-40', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.4)');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

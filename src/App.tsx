@@ -29,7 +29,7 @@ interface NewsItem {
 }
 
 // Feed types
-type FeedSource = 'all' | 'hn' | 'pitchbook' | 'rss' | 'linkedin' | 'news' | 'producthunt' | 'report' | 'starred'
+type FeedSource = 'all' | 'hn' | 'pitchbook' | 'rss' | 'linkedin' | 'news' | 'report' | 'starred'
 
 interface FeedItem {
   id: string
@@ -1719,31 +1719,6 @@ function App() {
     return results
   }
 
-  const fetchProductHunt = async (): Promise<FeedItem[]> => {
-    try {
-      const response = await fetch('https://0h4smabbsg-dsn.algolia.net/1/indexes/Post_production?hitsPerPage=15', {
-        headers: {
-          'X-Algolia-API-Key': '9670d2d619b9d07859448d7628eea5f3',
-          'X-Algolia-Application-Id': '0H4SMABBSG',
-        }
-      })
-      if (!response.ok) return []
-      const data = await response.json()
-      return (data.hits || []).map((post: any) => ({
-        id: `ph-${post.objectID || post.id}`,
-        source: 'producthunt' as FeedSource,
-        title: post.name,
-        url: `https://www.producthunt.com/posts/${post.slug}`,
-        date: post.created_at || new Date().toISOString(),
-        summary: post.tagline,
-        score: post.votes_count,
-      }))
-    } catch (error) {
-      console.error('Error fetching Product Hunt:', error)
-      return []
-    }
-  }
-
   const fetchNewsApi = async (): Promise<FeedItem[]> => {
     if (!feedSettings.newsApiKey) return []
     try {
@@ -1825,8 +1800,6 @@ function App() {
     results.push(...newsItems)
     const rssItems = await fetchRssFeeds()
     results.push(...rssItems)
-    const phItems = await fetchProductHunt()
-    results.push(...phItems)
     const insightItems = await fetchInsightsFromNotion()
     results.push(...insightItems)
     results.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -2021,14 +1994,6 @@ function App() {
       )
       return stories.map((s: any) => ({ title: s.title, url: s.url, score: s.score, comments: s.descendants }))
     },
-    fetch_product_hunt: async () => {
-      setAgentStatus('Fetching Product Hunt...')
-      const response = await fetch('https://0h4smabbsg-dsn.algolia.net/1/indexes/Post_production?hitsPerPage=10', {
-        headers: { 'X-Algolia-API-Key': '9670d2d619b9d07859448d7628eea5f3', 'X-Algolia-Application-Id': '0H4SMABBSG' }
-      })
-      const data = await response.json()
-      return (data.hits || []).map((p: any) => ({ title: p.name, tagline: p.tagline, url: `https://www.producthunt.com/posts/${p.slug}`, votes: p.votes_count }))
-    },
     fetch_tech_news: async () => {
       setAgentStatus('Fetching Tech News...')
       if (!feedSettings.newsApiKey) return []
@@ -2074,7 +2039,6 @@ function App() {
 
   const toolDefinitions = [
     { type: 'function', function: { name: 'fetch_hacker_news', description: 'Fetch the latest top stories from Hacker News', parameters: { type: 'object', properties: {}, required: [] } } },
-    { type: 'function', function: { name: 'fetch_product_hunt', description: 'Fetch the latest products from Product Hunt', parameters: { type: 'object', properties: {}, required: [] } } },
     { type: 'function', function: { name: 'fetch_tech_news', description: 'Fetch the latest technology news headlines', parameters: { type: 'object', properties: {}, required: [] } } },
     { type: 'function', function: { name: 'fetch_rss_betakit', description: 'Fetch the latest articles from BetaKit (Canadian tech news)', parameters: { type: 'object', properties: {}, required: [] } } },
     { type: 'function', function: { name: 'fetch_rss_techcrunch', description: 'Fetch the latest articles from TechCrunch', parameters: { type: 'object', properties: {}, required: [] } } },
@@ -2088,10 +2052,9 @@ function App() {
     setAgentStatus('Starting agent...')
     try {
       const sourceInstructions: string[] = []
-      const sources = reportTemplate.sources.includes('all') ? ['hn', 'news', 'producthunt', 'rss'] : reportTemplate.sources
+      const sources = reportTemplate.sources.includes('all') ? ['hn', 'news', 'rss'] : reportTemplate.sources
       if (sources.includes('hn')) sourceInstructions.push('- Use fetch_hacker_news to get Hacker News stories')
       if (sources.includes('news')) sourceInstructions.push('- Use fetch_tech_news to get technology news')
-      if (sources.includes('producthunt')) sourceInstructions.push('- Use fetch_product_hunt to get Product Hunt launches')
       if (sources.includes('rss')) {
         sourceInstructions.push('- Use fetch_rss_betakit to get BetaKit articles')
         sourceInstructions.push('- Use fetch_rss_techcrunch to get TechCrunch articles')
@@ -2108,7 +2071,6 @@ function App() {
         if (name === 'web_search' && reportTemplate.useSearch) return true
         if (sources.includes('hn') && name === 'fetch_hacker_news') return true
         if (sources.includes('news') && name === 'fetch_tech_news') return true
-        if (sources.includes('producthunt') && name === 'fetch_product_hunt') return true
         if (sources.includes('rss') && (name === 'fetch_rss_betakit' || name === 'fetch_rss_techcrunch')) return true
         return false
       })
@@ -2864,7 +2826,7 @@ function App() {
                 {/* Source Tabs */}
                 {activeSource !== 'report' && feedFiltersOpen && (
                 <div className="source-tabs">
-                {(['all', 'starred', 'hn', 'news', 'producthunt', 'pitchbook', 'rss', 'linkedin'] as FeedSource[]).map(source => (
+                {(['all', 'starred', 'hn', 'news', 'pitchbook', 'rss', 'linkedin'] as FeedSource[]).map(source => (
                   <button
                     key={source}
                     className={`source-tab ${activeSource === source ? 'active' : ''} ${source === 'starred' && starredItems.length > 0 ? 'has-items' : ''}`}
@@ -3052,7 +3014,7 @@ function App() {
                            item.source === 'pitchbook' ? 'PB' :
                            item.source === 'rss' ? 'RSS' :
                            item.source === 'linkedin' ? 'LI' :
-                           item.source === 'producthunt' ? 'PH' : 'News'}
+                           'News'}
                         </div>
                         <div className="feed-item-title">{item.title}</div>
                         <div className="feed-item-meta">
@@ -3346,7 +3308,6 @@ function App() {
                 {([
                   { key: 'hn', label: 'HN', full: 'Hacker News' },
                   { key: 'news', label: 'News', full: 'News' },
-                  { key: 'producthunt', label: 'PH', full: 'Product Hunt' },
                   { key: 'rss', label: 'RSS', full: 'RSS Feeds' },
                   { key: 'pitchbook', label: 'PB', full: 'PitchBook' },
                   { key: 'linkedin', label: 'LI', full: 'LinkedIn' },

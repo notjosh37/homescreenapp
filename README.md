@@ -24,7 +24,6 @@ Multi-source aggregation with n8n pipeline integration:
 |--------|-------------|
 | HN | Hacker News top stories |
 | News | NewsAPI headlines |
-| PH | Product Hunt launches |
 | RSS | BetaKit, TechCrunch feeds |
 
 **Filtering:**

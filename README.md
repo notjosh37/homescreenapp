@@ -1,50 +1,88 @@
 # Homescreen
 
-A personal dashboard with animated shader backgrounds, task management, and multi-source news aggregation. Built with React 19 and Vite.
+A personal productivity dashboard designed as a browser homepage for VC/startup founders and technologists. Consolidates information streams, quick-access tools, and AI-powered insights into a single elegant view.
+
+Built with React 19, TypeScript, and Vite.
+
+## Why This Exists
+
+Rather than switching between dozens of tabs and apps, everything surfaces on one homescreen. It's a command center for someone who values their attention and wants their browser start page to be genuinely useful.
 
 ## Features
 
-### Animated Backgrounds
-- **Shader Effects**: Swirl and ChromaFlow WebGL animations
-- **Customizable Colors**: Background, accent, and text colors
-- **Unsplash Integration**: Dynamic background images
-- **Grain Overlay**: Subtle texture effect for depth
+### Quick Shortcuts
+- Links to frequently used sites (Google, GitHub, Claude, etc.)
+- App launchers (e.g., open Slack directly)
+- Terminal commands (e.g., launch Claude Code in terminal)
+- Fully customizable - add any URL, app, or shell command
 
-### Task Management
-- Local storage persistence
-- Notion database sync (optional)
-- Filter by status and type
-- Sort by date, name, or status
+### Notion-Integrated Todo System
+- Bidirectional sync with a Notion database
+- Filter by date range (today, week, month)
+- Mark items complete directly from the homescreen
+- Add new tasks that push to Notion
 - Configurable task limit per view
 
-### News Feed
-Multi-source aggregation with n8n pipeline integration:
+### Multi-Source News Feed
+Aggregates content from multiple sources:
 
 | Source | Description |
 |--------|-------------|
-| HN | Hacker News top stories |
-| News | NewsAPI headlines |
-| RSS | BetaKit, TechCrunch feeds |
+| Hacker News | Tech community discussions and launches |
+| RSS Feeds | TechCrunch, BetaKit (startup/VC news) |
+| NewsAPI | General tech headlines |
+| Notion Insights | Curated items with relevance scores and themes |
 
-**Filtering:**
-- Date range: Today, Week, Month, or Custom
-- Score threshold slider (0-10)
-- Theme tag multi-select
-- Full-text search
+**Filtering capabilities:**
+- By source, date range (Today/Week/Month/Custom)
+- Full-text search across titles and summaries
+- By relevance score threshold (0-10 slider)
+- By theme tags (multi-select)
+- Star items for later reference (persisted)
 
-**Features:**
-- Star items for later (persisted)
-- Pagination with Load More
+**Display options:**
 - Sort by Recent or Top score
+- Pagination with Load More
 
-### AI Reports
-Generate summaries from feed items using OpenAI:
-- Customizable report templates
-- Save template presets
-- Export to Notion
+### AI-Powered Report Generation
+Generate synthesized reports from feed items using OpenAI:
+- **Daily Insights** - Executive summary, key trends, notable items, opportunities
+- **Daily Update** - Newsletter-style briefing with top stories and quick hits
+- **Custom Research** - Web search augmented deep-dive on any topic
 
-### Shortcuts
-Quick links to websites, apps, files, and shell commands.
+Features:
+- Customizable prompt templates
+- Save custom presets
+- Export reports to Notion
+- Optional web search for deeper research
+
+### Visual Customization
+- **Shader Backgrounds** - Swirl and ChromaFlow WebGL animations with adjustable colors, speed, detail
+- **Unsplash Integration** - Dynamic background images (replaces shader when enabled)
+- **Full Color Theming** - Background, accent, text colors with live preview
+- **Content Backdrop** - Adjustable opacity blur panel behind content
+- **Section Visibility** - Toggle shortcuts, todos, feed sections on/off
+- **Grain Overlay** - Subtle texture effect for depth
+
+## Usage Workflow
+
+**Morning Routine:**
+1. Open browser to homescreen
+2. Scan the time/date and personalized greeting
+3. Quick-hit shortcuts for email, portfolio dashboards, or deal flow tools
+4. Review todos synced from Notion (today's priorities)
+5. Scan the aggregated feed for overnight developments
+6. Generate a "Daily Insights" report for the team
+
+**Throughout the Day:**
+- Star interesting feed items for later
+- Use keyboard shortcuts for quick access
+- Quick-launch Claude Code for development tasks
+
+**Research Mode:**
+- Use "Custom Research" template with web search enabled
+- Filter feed by themes relevant to a sector thesis
+- Export curated insights to Notion for team sharing
 
 ## Quick Start
 
@@ -54,7 +92,7 @@ git clone https://github.com/notjosh37/homescreenapp.git
 cd homescreenapp
 npm install
 
-# Configure environment
+# Configure environment (optional)
 cp .env.example .env
 # Edit .env with your API keys
 
@@ -121,9 +159,49 @@ Access via `Cmd + Shift + S` or the gear icon:
 4. Copy database ID from URL
 
 ### Insights Database
-For feed aggregation via n8n:
+For feed aggregation:
 - Same setup as todos
-- Columns: Title, URL, Source, Date, Score, Themes
+- Columns: Title, URL, Source, Date, Score, Themes, Company, Summary
+
+## Tech Stack
+
+- **Frontend**: React 19, TypeScript
+- **Build**: Vite 7
+- **Graphics**: WebGL shaders via `shaders` package
+- **Styling**: CSS with custom properties
+- **Font**: Domine (serif)
+- **APIs**: Notion, NewsAPI, Unsplash, OpenAI
+
+## Project Structure
+
+```
+src/
+  App.tsx       # Main component (state, logic, UI)
+  App.css       # All styles
+  main.tsx      # Entry point
+  index.css     # Base styles, font imports
+api/
+  notion.ts     # Vercel serverless function for Notion proxy
+```
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Connect repo to Vercel
+2. Add environment variables in dashboard
+3. Deploy
+
+The `api/notion.ts` serverless function proxies Notion API requests to avoid CORS issues.
+
+### Manual Build
+
+```bash
+npm run build
+npm run preview
+```
+
+Output in `dist/` directory.
 
 ## Auto-Start (macOS)
 
@@ -156,35 +234,6 @@ EOF
 # Load it
 launchctl load ~/Library/LaunchAgents/com.homescreenapp.plist
 ```
-
-## Tech Stack
-
-- **Frontend**: React 19, TypeScript
-- **Build**: Vite 7
-- **Styling**: CSS with custom properties
-- **Font**: Domine (serif)
-- **APIs**: Notion, NewsAPI, Unsplash, OpenAI
-
-## Project Structure
-
-```
-src/
-  App.tsx       # Main component (state, logic, UI)
-  App.css       # All styles
-  main.tsx      # Entry point
-  index.css     # Base styles
-docs/
-  PRD-insights-panel.md  # Feature specifications
-```
-
-## Building for Production
-
-```bash
-npm run build
-npm run preview
-```
-
-Output in `dist/` directory.
 
 ## License
 

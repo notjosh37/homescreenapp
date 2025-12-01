@@ -2,7 +2,7 @@
 
 A personal productivity dashboard designed as a browser homepage for VC/startup founders and technologists. Consolidates information streams, quick-access tools, and AI-powered insights into a single elegant view.
 
-Built with React 19, TypeScript, and Vite.
+Built with React 19, TypeScript, Vite, and Supabase.
 
 ## Why This Exists
 
@@ -29,20 +29,24 @@ Aggregates content from multiple sources:
 | Source | Description |
 |--------|-------------|
 | Hacker News | Tech community discussions and launches |
+| GitHub Trending | Trending repositories across languages |
+| YC Companies | Y Combinator startup directory via YC-OSS API |
+| ArXiv | AI/ML research papers (cs.AI, cs.LG, cs.CL, cs.CV, stat.ML) |
 | RSS Feeds | TechCrunch, BetaKit (startup/VC news) |
-| NewsAPI | General tech headlines |
-| Notion Insights | Curated items with relevance scores and themes |
+| NewsAPI | General tech headlines (optional) |
 
 **Filtering capabilities:**
 - By source, date range (Today/Week/Month/Custom)
 - Full-text search across titles and summaries
-- By relevance score threshold (0-10 slider)
+- Semantic search with vector embeddings (requires Supabase + OpenAI)
+- By relevance score threshold
 - By theme tags (multi-select)
-- Star items for later reference (persisted)
+- Star items for later reference (persisted to Supabase)
 
 **Display options:**
 - Sort by Recent or Top score
 - Pagination with Load More
+- Real-time updates via Supabase subscriptions
 
 ### AI-Powered Report Generation
 Generate synthesized reports from feed items using OpenAI:
@@ -107,6 +111,11 @@ Open http://localhost:5173
 Create a `.env` file in the project root:
 
 ```env
+# Supabase (recommended for full functionality)
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+
+# Optional integrations
 VITE_NOTION_API_KEY=ntn_xxx
 VITE_NOTION_DATABASE_ID=xxx
 VITE_NEWS_API_KEY=xxx
@@ -116,13 +125,24 @@ VITE_OPENAI_API_KEY=sk-xxx
 
 | Variable | Required | Description |
 |----------|----------|-------------|
+| `VITE_SUPABASE_URL` | No* | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | No* | Supabase anonymous key |
 | `VITE_NOTION_API_KEY` | No | Notion integration API key |
-| `VITE_NOTION_DATABASE_ID` | No | Notion database for todos/insights |
+| `VITE_NOTION_DATABASE_ID` | No | Notion database for todos |
 | `VITE_NEWS_API_KEY` | No | NewsAPI.org key for headlines |
 | `VITE_UNSPLASH_API_KEY` | No | Unsplash API for background images |
 | `VITE_OPENAI_API_KEY` | No | OpenAI key for AI report generation |
 
-All keys are optional. Features degrade gracefully without them.
+*Without Supabase, the app falls back to client-side fetching (HN + RSS only).
+
+### Supabase Edge Function Secrets
+
+Set these in your Supabase dashboard under Project Settings > Edge Functions:
+
+| Secret | Description |
+|--------|-------------|
+| `OPENAI_API_KEY` | For generating embeddings (semantic search) |
+| `GITHUB_TOKEN` | For enriching GitHub trending repos with API data |
 
 ## Keyboard Shortcuts
 
@@ -167,21 +187,87 @@ For feed aggregation:
 
 - **Frontend**: React 19, TypeScript
 - **Build**: Vite 7
+- **Backend**: Supabase (PostgreSQL + Edge Functions)
+- **Vector Search**: pgvector + OpenAI embeddings
 - **Graphics**: WebGL shaders via `shaders` package
 - **Styling**: CSS with custom properties
 - **Font**: Domine (serif)
-- **APIs**: Notion, NewsAPI, Unsplash, OpenAI
+- **APIs**: Notion, NewsAPI, Unsplash, OpenAI, GitHub, ArXiv, YC-OSS
 
 ## Project Structure
 
 ```
 src/
-  App.tsx       # Main component (state, logic, UI)
-  App.css       # All styles
-  main.tsx      # Entry point
-  index.css     # Base styles, font imports
+  App.tsx                    # Main component (state, logic, UI)
+  App.css                    # All styles
+  main.tsx                   # Entry point
+  index.css                  # Base styles, font imports
+  types/
+    index.ts                 # TypeScript interfaces and defaults
+  services/
+    supabase.ts              # Supabase client and query helpers
+  hooks/
+    useFeed.ts               # Feed, search, and sources hooks
+    useLocalStorage.ts       # localStorage sync hook
+  components/
+    FeedSection.tsx          # Feed component with Supabase integration
 api/
-  notion.ts     # Vercel serverless function for Notion proxy
+  notion.ts                  # Vercel serverless function for Notion proxy
+supabase/
+  migrations/
+    20241201000000_initial_schema.sql  # Database schema
+  functions/
+    _shared/                 # Shared utilities (CORS, Supabase client)
+    fetch-hn/                # Hacker News fetcher
+    fetch-github/            # GitHub Trending fetcher
+    fetch-yc/                # YC Companies fetcher
+    fetch-arxiv/             # ArXiv papers fetcher
+    fetch-rss/               # RSS feed fetcher
+    embed-content/           # OpenAI embedding generator
+    search/                  # Hybrid semantic search
+```
+
+## Supabase Setup
+
+1. Create a new Supabase project at [supabase.com](https://supabase.com)
+
+2. Run the database migration:
+   ```bash
+   supabase link --project-ref your-project-ref
+   supabase db push
+   ```
+
+3. Deploy edge functions:
+   ```bash
+   supabase functions deploy
+   ```
+
+4. Set edge function secrets:
+   ```bash
+   supabase secrets set OPENAI_API_KEY=sk-xxx
+   supabase secrets set GITHUB_TOKEN=ghp_xxx
+   ```
+
+5. Add environment variables to your `.env`:
+   ```env
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key
+   ```
+
+### Scheduled Fetching
+
+Set up scheduled fetches using Supabase's pg_cron:
+
+```sql
+-- Fetch HN every 30 minutes
+SELECT cron.schedule('fetch-hn', '*/30 * * * *',
+  $$SELECT net.http_post(
+    'https://your-project.supabase.co/functions/v1/fetch-hn',
+    '{}',
+    'application/json',
+    ARRAY[http_header('Authorization', 'Bearer ' || current_setting('app.supabase_service_key'))]
+  )$$
+);
 ```
 
 ## Deployment
